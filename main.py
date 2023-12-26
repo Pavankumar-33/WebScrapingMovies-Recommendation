@@ -80,6 +80,9 @@ if response.status_code == 200:
 
     df = pd.DataFrame(data)
 
+    # Save the DataFrame to a pickle file
+    df.to_pickle('data.pkl')
+
     # Print the extracted movie data
     print(df)
 
