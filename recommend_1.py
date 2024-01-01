@@ -3,6 +3,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.neighbors import NearestNeighbors
 import ast
+import nltk
+from nltk.stem.porter import PorterStemmer
 
 
 # Read the DataFrame from the pickle file
@@ -90,4 +92,35 @@ cv.fit_transform(new_df['tags']).toarray().shape
 
 #convert count vector to array
 vector = cv.fit_transform(new_df['tags']).toarray()
-print(vector[0])
+#print(vector[0])
+
+ps = PorterStemmer()
+
+def stem(text):
+    array = []
+    for i in text.split():
+        array.append(ps.stem(i))
+    return " ".join(array)
+
+new_df['tags'] = new_df['tags'].apply(stem)
+
+#--------------------------------------------------------------------
+
+similarity = cosine_similarity(vector)
+#.shape for a*b
+#print(similarity[0].shape)
+
+sorted(list(enumerate(similarity[0])), reverse = True, key = lambda x:x[1])[1:6]
+#print(sorted(list(enumerate(similarity[0])), reverse = True, key = lambda x:x[1])[1:6])
+
+#rec syst
+def recommend(movie):
+    movie_index = new_df[new_df['title'] == movie].index[0]
+    distance = similarity[movie_index]
+    movies_list = sorted(list(enumerate(distance)), reverse = True, key = lambda x:x[1])[1:6]
+
+    for i in movies_list:
+        print(new_df.iloc[i[0]].title)
+
+
+recommend('Iron Man')
